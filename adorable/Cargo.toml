@@ -1,0 +1,14 @@
+[package]
+name = "adorable"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+image = "0.24.1"
+common = { path = "../common" }
+rayon = "1.5.1"
+tokio = "1.15.0"
+log = "0.4"
+bytes = "1.1.0"
