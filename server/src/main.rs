@@ -1,5 +1,3 @@
-use std::sync::RwLock;
-
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
@@ -7,13 +5,13 @@ use rand::{thread_rng, Rng};
 use adorable::FaceFactory;
 
 pub async fn create_avatar(
-    face_factory: web::Data<RwLock<FaceFactory>>,
+    face_factory: web::Data<FaceFactory>,
     size: u32,
     value: String,
 ) -> impl Responder {
     let image_data = web::block(move || {
         log::info!("Request {:?}", &value);
-        let image_data = adorable::create_avatar(face_factory.read().unwrap(), size, &value);
+        let image_data = adorable::create_avatar(face_factory.as_ref().clone(), size, &value);
         image_data
     })
     .await
@@ -26,7 +24,7 @@ pub async fn create_avatar(
 
 #[get("/{size}/{random}")]
 async fn avatar_with_custom_value(
-    face_factory: web::Data<RwLock<FaceFactory>>,
+    face_factory: web::Data<FaceFactory>,
     path: web::Path<(u32, String)>,
 ) -> impl Responder {
     let (size, value) = path.into_inner();
@@ -35,7 +33,7 @@ async fn avatar_with_custom_value(
 
 #[get("/{size}/random")]
 async fn avatar_with_random_value(
-    face_factory: web::Data<RwLock<FaceFactory>>,
+    face_factory: web::Data<FaceFactory>,
     path: web::Path<u32>,
 ) -> impl Responder {
     let rand_string: String = thread_rng()
@@ -50,7 +48,7 @@ async fn avatar_with_random_value(
 async fn main() -> std::io::Result<()> {
     env_logger::init();
     let face_factory = adorable::create_face_factory();
-    let face_factory = web::Data::new(RwLock::new(face_factory));
+    let face_factory = web::Data::new(face_factory);
 
     let port = std::env::var("PORT")
         .unwrap_or("8080".to_string())

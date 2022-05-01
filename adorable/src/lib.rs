@@ -11,11 +11,7 @@ pub use crate::face::FaceFactory;
 mod face;
 mod utils;
 
-pub fn create_avatar(
-    face_factory: RwLockReadGuard<FaceFactory>,
-    size: u32,
-    input: &str,
-) -> Vec<u8> {
+pub fn create_avatar(face_factory: &FaceFactory, size: u32, input: &str) -> Vec<u8> {
     let face = face_factory.create(input);
     let mut background = ImageBuffer::from_pixel(400, 400, face.color);
 
